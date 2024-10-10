@@ -43,11 +43,15 @@
         scoreThreshold: 0.6,
     };
 
-    let video = document.createElement('video');
+    let video;
     let model;
 
     // Start hand tracking when the page loads
     window.onload = function() {
+        video = document.createElement('video');
+        video.width = 640;
+        video.height = 480;
+        
         handTrack.startVideo(video).then(function(status) {
             if (status) {
                 console.log("Video started. Now tracking.");
@@ -60,6 +64,7 @@
         // Load the hand tracking model
         handTrack.load(modelParams).then(function(l) {
             model = l;
+            console.log("Handtrack model loaded.");
         });
     };
 
@@ -70,9 +75,11 @@
                 let hand = predictions[0];
                 document.getElementById('handModel').setAttribute('visible', true);
                 // Set position based on detected hand
-                let x = (hand.bbox[0] + hand.bbox[2]) / 2;
-                let y = (hand.bbox[1] + hand.bbox[3]) / 2;
-                document.getElementById('handModel').setAttribute('position', `${(x / window.innerWidth) * 2 - 1} ${(y / window.innerHeight) * 2 - 1} -2`);
+                let x = hand.bbox[0] + hand.bbox[2];
+                let y = hand.bbox[1] + hand.bbox[3];
+                
+                // Map detected coordinates to A-Frame coordinates
+                document.getElementById('handModel').setAttribute('position', `${(x / window.innerWidth) * 2 - 1} ${(y / window.innerHeight) * 2 - 1} -1.5`);
             } else {
                 document.getElementById('handModel').setAttribute('visible', false);
             }
